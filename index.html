@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Movimientos ICBC | Fábrica SRL</title>
+  <meta name="description" content="Seguimiento e identificación de movimientos bancarios ICBC">
+  <meta name="theme-color" content="#0A4086">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Movimientos ICBC">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+
+  <!-- Conexión a Supabase: la anon key es pública por diseño; los datos están protegidos por RLS. -->
+  <script>
+    window.APP_CONFIG = {
+      supabaseUrl: 'https://zewgswnatkthgzqahdeq.supabase.co',
+      supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpld2dzd25hdGt0aGd6cWFoZGVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwNzE1NjcsImV4cCI6MjEwMjY0NzU2N30.U1P9eE4hGefV9h-dAy98-cw5p98ktFOnIPvfoghvcjc',
+    };
+  </script>
+</head>
+<body>
+  <!-- Ingreso -->
+  <main id="pantalla-ingreso" class="ingreso" hidden>
+    <form id="form-ingreso" class="ingreso__caja" novalidate>
+      <img src="/icons/icon-192.png" alt="" width="96" height="96" class="ingreso__icono">
+      <h1>Movimientos ICBC</h1>
+      <p class="ingreso__bajada">Fábrica SRL</p>
+      <label for="ingreso-email">Correo de la empresa</label>
+      <input id="ingreso-email" type="email" autocomplete="email" inputmode="email" placeholder="nombre@fabricasrl.com.ar" required>
+      <button type="submit" class="btn btn--primario" id="ingreso-boton">Ingresar</button>
+      <p id="ingreso-error" class="ingreso__error" role="alert"></p>
+    </form>
+  </main>
+
+  <!-- Aplicación -->
+  <div id="app" hidden>
+    <header class="barra">
+      <div class="barra__marca">
+        <img src="/icons/icon-192.png" alt="" width="36" height="36">
+        <div>
+          <strong>Movimientos ICBC</strong>
+          <span id="barra-cuenta" class="barra__cuenta"></span>
+        </div>
+      </div>
+      <nav class="barra__nav" aria-label="Secciones">
+        <button class="nav-btn activo" data-vista="movimientos">Movimientos</button>
+        <button class="nav-btn" data-vista="importar" data-requiere="editar">Importar</button>
+        <button class="nav-btn" data-vista="usuarios" data-requiere="admin">Usuarios</button>
+      </nav>
+      <div class="barra__usuario">
+        <span id="barra-usuario"></span>
+        <button id="btn-salir" class="btn btn--fantasma">Salir</button>
+      </div>
+    </header>
+
+    <!-- Vista: movimientos -->
+    <section id="vista-movimientos" class="vista">
+      <div class="meses" id="meses" role="tablist" aria-label="Meses"></div>
+      <div class="resumen" id="resumen" aria-live="polite"></div>
+      <div class="filtros">
+        <input id="f-texto" type="search" placeholder="Buscar concepto, nombre, banco, cheque…" aria-label="Buscar">
+        <select id="f-ident" aria-label="Identificación">
+          <option value="">Identificación: todos</option>
+          <option value="si">Identificados</option>
+          <option value="no">Sin identificar</option>
+        </select>
+        <select id="f-concil" aria-label="Conciliación">
+          <option value="">Conciliación: todos</option>
+          <option value="si">Conciliados</option>
+          <option value="no">Pendientes de conciliar</option>
+        </select>
+        <select id="f-resp" aria-label="Responsable"></select>
+        <select id="f-tipo" aria-label="Tipo">
+          <option value="">Débitos y créditos</option>
+          <option value="debito">Débitos</option>
+          <option value="credito">Créditos</option>
+        </select>
+      </div>
+      <div class="tabla-marco">
+        <table class="tabla" id="tabla">
+          <thead>
+            <tr>
+              <th>Fecha</th><th>Concepto</th><th>Datos</th>
+              <th class="num">Débito</th><th class="num">Crédito</th>
+              <th>Info. complementaria</th><th>Nro. cheque</th><th class="num">Suc.</th>
+              <th>Canal</th><th>Banco</th><th>Nombre</th>
+              <th class="g g-ident">Identif.</th><th class="g g-resp">Responsable</th>
+              <th class="g g-coment">Coment.</th><th class="g g-concil">Concil.</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-cuerpo"></tbody>
+        </table>
+        <p id="tabla-vacia" class="vacio" hidden></p>
+      </div>
+    </section>
+
+    <!-- Vista: importar -->
+    <section id="vista-importar" class="vista" hidden>
+      <div class="panel-simple">
+        <h2>Importar planillas del banco</h2>
+        <p>Elegí uno o varios archivos <b>.xlsx</b> de movimientos ICBC. Se leen todas las hojas y se toman las 11 columnas definidas. Las filas con el débito o el crédito pintado de verde se cargan como identificadas. Los registros que ya están cargados no se duplican.</p>
+        <label class="soltar" id="soltar">
+          <input type="file" id="archivos" accept=".xlsx" multiple>
+          <span>Arrastrá los archivos acá o <u>elegilos desde la computadora</u></span>
+        </label>
+        <div id="import-previa"></div>
+        <button id="btn-importar" class="btn btn--primario" hidden>Importar</button>
+        <div id="import-resultado" aria-live="polite"></div>
+        <h3>Últimas importaciones</h3>
+        <div id="import-historial"></div>
+      </div>
+    </section>
+
+    <!-- Vista: usuarios -->
+    <section id="vista-usuarios" class="vista" hidden>
+      <div class="panel-simple">
+        <h2>Usuarios</h2>
+        <p>Ingresan solo con su correo. Un usuario desactivado no puede entrar, pero su nombre se conserva en los registros y comentarios.</p>
+        <div class="tabla-marco tabla-marco--auto">
+          <table class="tabla tabla--usuarios">
+            <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Activo</th><th>Ingresó</th></tr></thead>
+            <tbody id="usuarios-cuerpo"></tbody>
+          </table>
+        </div>
+        <h3>Agregar usuario</h3>
+        <form id="form-usuario" class="form-usuario">
+          <input name="nombre" placeholder="Nombre" required>
+          <input name="apellido" placeholder="Apellido" required>
+          <input name="email" type="email" placeholder="correo@fabricasrl.com.ar" required>
+          <select name="rol">
+            <option value="editor">Editor</option>
+            <option value="admin">Administrador</option>
+            <option value="lector">Solo lectura</option>
+          </select>
+          <button class="btn btn--primario">Agregar usuario</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <!-- Detalle de un movimiento -->
+  <div id="velo" class="velo" hidden></div>
+  <aside id="detalle" class="detalle" hidden aria-labelledby="detalle-titulo" role="dialog">
+    <div class="detalle__cab">
+      <button id="detalle-cerrar" class="btn btn--fantasma" aria-label="Cerrar">Cerrar</button>
+    </div>
+    <div id="detalle-cuerpo"></div>
+  </aside>
+
+  <div id="aviso" class="aviso" role="status" hidden></div>
+
+  <script src="/vendor/supabase.js"></script>
+  <script src="/vendor/exceljs.min.js" defer></script>
+  <script src="/importador.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
