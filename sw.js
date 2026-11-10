@@ -1,10 +1,10 @@
 /* Service worker: permite instalar la app y abrirla rápido.
    Solo guarda en caché los archivos propios; los datos de Supabase nunca se cachean. */
-const VERSION = 'bco-v1';
+const VERSION = 'bco-v2';
 const ARCHIVOS = [
   '/', '/index.html', '/styles.css', '/app.js', '/importador.js', '/manifest.webmanifest',
   '/vendor/supabase.js', '/vendor/591.supabase.js', '/vendor/exceljs.min.js',
-  '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png', '/icons/favicon-32.png',
+  '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png', '/icons/icon-maskable-192.png', '/icons/icon-maskable-512.png', '/icons/favicon-32.png',
 ];
 
 self.addEventListener('install', (e) => {
