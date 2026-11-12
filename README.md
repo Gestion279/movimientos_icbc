@@ -57,7 +57,7 @@ git push -u origin main
   - *Solo lectura:* solo consulta.
 - **Identificado:** se toma del verde de la planilla (celda de Débito o Crédito) y se puede cambiar en la app.
 - **Comentarios:** quedan en el historial y no se pueden editar ni borrar.
-- **Historial de cambios:** cada cambio de responsable, identificado y conciliado queda registrado con quién y cuándo.
+- **Historial de cambios:** cada cambio de responsable, identificado, registrado en Bejerman y conciliado queda registrado con quién y cuándo.
 - **Tiempo real:** los cambios de un usuario aparecen en las pantallas de los demás sin recargar.
 - **Importación:** se pueden subir las planillas mensuales del banco. Los registros repetidos, ya sea entre hojas o en archivos subidos de nuevo, no se duplican.
 

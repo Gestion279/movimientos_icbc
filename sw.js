@@ -1,6 +1,6 @@
 /* Service worker: permite instalar la app y abrirla rápido.
    Solo guarda en caché los archivos propios; los datos de Supabase nunca se cachean. */
-const VERSION = 'bco-v3';
+const VERSION = 'bco-v4';
 const ARCHIVOS = [
   '/', '/index.html', '/styles.css', '/app.js', '/importador.js', '/manifest.webmanifest',
   '/vendor/supabase.js', '/vendor/591.supabase.js', '/vendor/exceljs.min.js',

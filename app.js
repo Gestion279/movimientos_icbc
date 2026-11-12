@@ -126,7 +126,7 @@
   async function cargarMes() {
     const cuerpo = $('#tabla-cuerpo');
     if (!E.mes) { E.movs = []; pintarTabla(); return; }
-    cuerpo.innerHTML = '<tr><td colspan="15" class="vacio">Cargando movimientos…</td></tr>';
+    cuerpo.innerHTML = '<tr><td colspan="16" class="vacio">Cargando movimientos…</td></tr>';
     const filas = []; const paso = 1000;
     for (let i = 0; ; i += paso) {
       const { data, error } = await sb.from('bco_v_movimientos').select('*').eq('mes', E.mes)
@@ -170,6 +170,7 @@
     const resp = `<select data-acc="resp" data-id="${m.id}" aria-label="Responsable" class="${m.responsable_id ? '' : 'vacio-resp'}"${dis}>${opcionesResp(m.responsable_id)}</select>`;
     const ident = `<input type="checkbox" class="chk chk--verde" data-acc="ident" data-id="${m.id}" aria-label="Identificado"${m.identificado ? ' checked' : ''}${dis}>`;
     const concil = `<input type="checkbox" class="chk" data-acc="concil" data-id="${m.id}" aria-label="Conciliado"${m.conciliado ? ' checked' : ''}${dis}>`;
+    const bej = `<input type="checkbox" class="chk" data-acc="bej" data-id="${m.id}" aria-label="Registrado en Bejerman"${m.registrado_bejerman ? ' checked' : ''}${dis}>`;
     const coment = `<button class="btn-coment${m.comentarios ? ' tiene' : ''}" data-acc="abrir" data-id="${m.id}" title="${esc(m.comentarios ? 'Ver comentarios' : 'Agregar comentario')}">${m.comentarios || '+'}</button>`;
     return `<tr data-id="${m.id}" class="${cls}">
       <td class="fecha m-ver">${fecha(m.fecha)}</td>
@@ -185,11 +186,13 @@
       <td class="nombre${m.nombre ? ' m-ver' : ''}" title="${esc(m.nombre)}">${esc(m.nombre)}</td>
       <td class="g g-ident">${ident}</td>
       <td class="g g-resp">${resp}</td>
+      <td class="g g-bej">${bej}</td>
       <td class="g g-coment">${coment}</td>
       <td class="g g-concil">${concil}</td>
       <td class="gestion-movil">
         <label>${ident.replace('aria-label="Identificado"', 'aria-label="Identificado (celular)"')} Identif.</label>
         ${resp}
+        <label>${bej.replace('aria-label="Registrado en Bejerman"', 'aria-label="Registrado en Bejerman (celular)"')} Bejerman</label>
         ${coment}
         <label>${concil.replace('aria-label="Conciliado"', 'aria-label="Conciliado (celular)"')} Concil.</label>
       </td>
@@ -290,6 +293,7 @@
         <div class="gestion">
           <label><input type="checkbox" class="chk chk--verde" data-acc="ident" data-id="${m.id}"${m.identificado ? ' checked' : ''}${dis}> Identificado</label>
           <label>Responsable <select data-acc="resp" data-id="${m.id}"${dis}>${opcionesResp(m.responsable_id)}</select></label>
+          <label><input type="checkbox" class="chk" data-acc="bej" data-id="${m.id}"${m.registrado_bejerman ? ' checked' : ''}${dis}> Registrado en Bejerman</label>
           <label><input type="checkbox" class="chk" data-acc="concil" data-id="${m.id}"${m.conciliado ? ' checked' : ''}${dis}>
             <span>Conciliado${m.conciliado && m.conciliado_por_nombre ? `<small>Por ${esc(m.conciliado_por_nombre)} el ${fechaHora(m.conciliado_en)}</small>` : ''}</span></label>
         </div>
@@ -458,6 +462,7 @@
       if (e.type !== 'change') return true;
       if (el.dataset.acc === 'ident') actualizar(id, { identificado: el.checked });
       if (el.dataset.acc === 'concil') actualizar(id, { conciliado: el.checked });
+      if (el.dataset.acc === 'bej') actualizar(id, { registrado_bejerman: el.checked });
       if (el.dataset.acc === 'resp') actualizar(id, { responsable_id: el.value || null });
       return true;
     };

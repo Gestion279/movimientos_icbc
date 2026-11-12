@@ -110,9 +110,10 @@ h3 { font-size: 15px; font-weight: 700; margin-top: 28px; }
 .tabla .g { padding-left: 6px; padding-right: 6px; }
 .tabla .g-concil { right: 0; width: 70px; min-width: 70px; max-width: 70px; }
 .tabla .g-coment { right: 70px; width: 76px; min-width: 76px; max-width: 76px; }
-.tabla .g-resp { right: 146px; width: 176px; min-width: 176px; max-width: 176px; }
-.tabla .g-ident { right: 322px; width: 66px; min-width: 66px; max-width: 66px; box-shadow: inset 1px 0 0 #B9C8DE; }
-.tabla td.g-resp select { width: 164px; padding: 4px 6px; border: 1px solid #B9C8DE; border-radius: 4px; background: #fff; font-size: 12.5px; }
+.tabla .g-bej { right: 146px; width: 104px; min-width: 104px; max-width: 104px; }
+.tabla .g-resp { right: 250px; width: 150px; min-width: 150px; max-width: 150px; }
+.tabla .g-ident { right: 400px; width: 66px; min-width: 66px; max-width: 66px; box-shadow: inset 1px 0 0 #B9C8DE; }
+.tabla td.g-resp select { width: 138px; padding: 4px 6px; border: 1px solid #B9C8DE; border-radius: 4px; background: #fff; font-size: 12.5px; }
 .tabla td.g-resp select.vacio-resp { color: var(--rojo); }
 .chk { width: 18px; height: 18px; accent-color: var(--azul); cursor: pointer; }
 .chk--verde { accent-color: var(--verde-linea); }
