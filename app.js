@@ -83,6 +83,8 @@
     const { data: yo, error } = await sb.from('bco_usuarios').select('*').eq('user_id', session.user.id).maybeSingle();
     if (error || !yo || !yo.activo) { await sb.auth.signOut(); return mostrarIngreso('Tu usuario no tiene acceso. Consultá con el administrador.'); }
     E.yo = yo;
+    // Registrar el ingreso (fecha y hora del último ingreso). Si falla, la app sigue igual.
+    try { await sb.rpc('bco_registrar_ingreso'); } catch (_) {}
     $('#pantalla-ingreso').hidden = true; $('#app').hidden = false;
     $('#barra-usuario').textContent = `${yo.nombre} ${yo.apellido}`;
     $$('[data-requiere]').forEach((b) => { b.hidden = b.dataset.requiere === 'admin' ? !esAdmin() : !puedeEditar(); });
@@ -405,7 +407,8 @@
           <option value="editor"${u.rol === 'editor' ? ' selected' : ''}>Editor</option>
           <option value="lector"${u.rol === 'lector' ? ' selected' : ''}>Solo lectura</option></select></td>
         <td><input type="checkbox" class="chk" data-uacc="activo" data-uid="${esc(u.id)}"${u.activo ? ' checked' : ''}${propio}></td>
-        <td>${u.user_id ? 'Sí' : 'Todavía no'}</td></tr>`;
+        <td>${u.user_id ? 'Sí' : 'Todavía no'}</td>
+        <td>${u.ultimo_ingreso ? fechaHora(u.ultimo_ingreso) : '—'}</td></tr>`;
     }).join('');
   }
   async function cambiarUsuario(id, cambios) {
